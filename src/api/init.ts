@@ -23,8 +23,6 @@ import { createRosettaBlockRouter } from './routes/rosetta/block';
 import { createRosettaAccountRouter } from './routes/rosetta/account';
 import { logger } from '../helpers';
 import { createWsRpcRouter } from './routes/ws-rpc';
-import * as prometheusMiddleware from '@promster/express';
-import * as prometheusServer from '@promster/server';
 
 export interface ApiServer {
   expressApp: ExpressWithAsync;
@@ -42,8 +40,8 @@ export async function startApiServer(datastore: DataStore): Promise<ApiServer> {
   const apiPort = parseInt(process.env['STACKS_BLOCKCHAIN_API_PORT'] ?? '');
   const dev = process.env.NODE_ENV !== 'production';
 
-  const { createMiddleware: createPrometheusMiddleware } = prometheusMiddleware;
-  const { createServer: createPrometheusServer } = prometheusServer;
+  const { createMiddleware: createPrometheusMiddleware } = require('@promster/express');
+  const { createServer: createPrometheusServer } = require('@promster/server');
 
   if (!apiHost) {
     throw new Error(
@@ -73,7 +71,7 @@ export async function startApiServer(datastore: DataStore): Promise<ApiServer> {
     await new Promise((resolve, reject) =>
       resolve(
         createPrometheusServer({ port: 9153 }).then(() =>
-          console.log(`@promster/server started on port 9153.`)
+          logger.info(`@promster/server started on port 9153.`)
         )
       )
     );
